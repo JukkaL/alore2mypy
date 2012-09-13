@@ -1,3 +1,13 @@
+-- Test cases for Alore-to-mypy conversion. Each test case consists of two 
+-- sections. The first section contains [case NAME] followed by the input 
+-- code, while the second section contains [out] followed by the output from 
+-- the translator.
+--
+-- Lines starting with "--" in this file will be ignored, except for lines
+-- starting with "----" that are not ignored. The first two dashes of these
+-- lines are interpreted as escapes and removed.
+
+
 [case testEmpty]
 [out]
 
