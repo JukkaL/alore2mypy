@@ -14,7 +14,7 @@ Alore module search path. For example, if you have installed Alore under
 /usr/local:
 
 <pre>
-  $ export ALOREPATH=/usr/local/share/alore/check
+ $ export ALOREPATH=/usr/local/share/alore/check
 </pre>
 
 TODO: Windows equivalent
