@@ -3,6 +3,12 @@ import analyse, errors
 import pygen
 
 
+def IncludeInOutput(tree)
+  return (tree.header == nil or not tree.header.id in ["std", "encodings"]) and
+         not "-skip." in tree.path
+end
+
+
 def Main(args)
   if args.length() != 1
     WriteLn("Usage: pgen.alo PROGRAM")
@@ -17,7 +23,7 @@ def Main(args)
     var r = PythonRenamer()
     r.update(map, memberMap)
     for t in trees
-      if not t.path.endsWith("/std.alo") and not "-skip." in t.path
+      if IncludeInOutput(t)
         -- Output a file. Omit std module and files with -skip suffix.
         WriteLn(Newline, t.path, ':', Newline)
         var v = PythonGeneratorVisitor(r, typemap)
