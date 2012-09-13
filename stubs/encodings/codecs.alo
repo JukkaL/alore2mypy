@@ -1,0 +1,76 @@
+module encodings
+
+
+const Strict, Unstrict
+const Bom = "" as Str -- FIX initialize
+
+
+interface Encoding
+  def decoder(strictness= as Constant) as Decoder
+  def encoder(strictness= as Constant) as Encoder
+  def name as Str
+end
+
+
+interface Decoder
+  def decode(s as Str) as Str
+  def unprocessed() as Str
+end
+
+
+interface Encoder
+  def encode(s as Str) as Str
+end
+
+
+const Ascii = nil as Encoding
+const Utf8 = nil as Encoding
+const Utf16 = nil as Encoding
+const Utf16Le = nil as Encoding
+const Utf16Be = nil as Encoding
+const Iso8859_1 = nil as Encoding
+const Latin1 = Iso8859_1 as Encoding
+const Iso8859_2 = nil as Encoding
+const Latin2 = Iso8859_2 as Encoding
+const Iso8859_3 = nil as Encoding
+const Latin3 = Iso8859_3 as Encoding
+const Iso8859_4 = nil as Encoding
+const Latin4 = Iso8859_4 as Encoding
+const Iso8859_5 = nil as Encoding
+const Iso8859_6 = nil as Encoding
+const Iso8859_7 = nil as Encoding
+const Iso8859_8 = nil as Encoding
+const Iso8859_9 = nil as Encoding
+const Latin5 = Iso8859_9 as Encoding
+const Iso8859_10 = nil as Encoding
+const Latin6 = Iso8859_10 as Encoding
+const Iso8859_11 = nil as Encoding
+const Iso8859_13 = nil as Encoding
+const Latin7 = Iso8859_13 as Encoding
+const Iso8859_14 = nil as Encoding
+const Latin8 = Iso8859_14 as Encoding
+const Iso8859_15 = nil as Encoding
+const Latin9 = Iso8859_15 as Encoding
+const Iso8859_16 = nil as Encoding
+const Latin10 = Iso8859_16 as Encoding
+const Windows1250 = nil as Encoding
+const Windows1251 = nil as Encoding
+const Windows1252 = nil as Encoding
+const Cp437 = nil as Encoding
+const Cp850 = nil as Encoding
+const Koi8R = nil as Encoding
+const Koi8U = nil as Encoding
+
+
+def Decode(string as Str, enc as Encoding, strictness = Strict as Constant)
+end
+
+def Encode(string as Str, enc as Encoding, strictness = Strict as Constant)
+end
+
+
+class EncodeError is ValueError
+end
+
+class DecodeError is ValueError
+end
