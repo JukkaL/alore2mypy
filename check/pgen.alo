@@ -1,0 +1,35 @@
+import io, os
+import analyse, errors
+import pygen
+
+
+def Main(args)
+  if args.length() != 1
+    WriteLn("Usage: pgen.alo PROGRAM")
+    Exit(1)
+  end
+
+  try
+    var src = File(args[0]).read()
+    -- Parse and analyse the program.
+    var trees, symtable, types, typemap = Analyse(src, args[0], True, "", True)
+    var map, memberMap = BuildRenameMaps(trees)
+    var r = PythonRenamer()
+    r.update(map, memberMap)
+    for t in trees
+      if not t.path.endsWith("/std.alo") and not "-skip." in t.path
+        -- Output a file. Omit std module and files with -skip suffix.
+        WriteLn(Newline, t.path, ':', Newline)
+        var v = PythonGeneratorVisitor(r, typemap)
+        t.accept(v)
+        var s = v.output()
+        Write(s)
+      end
+    end
+  except e is CompileError
+    -- Semantic analysis failed.
+    for s in e.messages
+      WriteLn(s)
+    end
+  end
+end

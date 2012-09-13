@@ -1,0 +1,12 @@
+module std
+
+-- Minimal std module stub for test cases.
+
+class Object
+end
+
+class Type -- Needed for subtype checks (BasicTypes)
+end
+
+class Int -- Can use integer literals
+end

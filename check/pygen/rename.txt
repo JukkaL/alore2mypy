@@ -1,0 +1,72 @@
+# Functions
+
+std::Write      alore.write
+std::WriteLn    alore.writeln
+std::Repr       repr
+std::Exit       exit
+std::Ord        ord
+std::Chr        chr
+std::Min        min
+std::Max        max
+std::Sort       sorted
+std::Abs        abs
+std::Reversed   reversed
+
+reflect::GetMember  getattr
+reflect::SetMember  setattr
+reflect::HasMember  hasattr
+reflect::TypeOf     type
+
+unittest::AssertEquals    assertEquals
+unittest::AssertNotEqual  assertNotEqual
+unittest::AssertRaises    assertRaises
+unittest::Assert          assertTrue
+unittest::AssertType      assertType
+
+re::Match       re.match
+re::Subst       re.sub
+re::Search      re.search
+
+io::StdOut      sys.stdout
+io::StdErr      sys.stderr
+io::StdIn       sys.stdin
+io::File        file
+
+os::AbsPath     os.path.abspath
+os::NormPath    os.path.normpath
+os::Join        os.path.join
+os::IsFile      os.path.isfile
+os::IsDir       os.path.isdir
+os::ChDir       os.chdir
+os::ListDir     os.listdir
+os::CurrentDir  os.getcwd
+os::MakeDir     os.mkdir
+os::Rename      os.rename
+os::GetEnv      os.getenv
+
+math::Round     math.round
+math::Floor     math.floor
+math::Ceil      math.ceil
+math::Sqrt      math.sqrt
+math::Sin       math.sin
+math::Cos       math.cos
+math::Tan       math.tan
+
+# Types
+
+std::Object          object
+std::Int             int
+std::Str             str
+std::Float           float
+std::Boolean         bool
+std::Array           list
+std::Map             dict
+std::Tuple           tuple
+os::Stat             os.stat
+set::Set             set
+
+# Misc
+
+Main            main
+std::True       True
+std::False      False

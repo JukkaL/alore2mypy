@@ -1,0 +1,788 @@
+module pygen
+
+import nodes
+import types
+import re
+import set
+
+
+const Indent = 4
+
+
+const OpMap = Map('div' : '//', 'mod' : '%')
+
+
+const MemberMap = Map(
+  'create' : '__init__',
+  '_str' : '__str__',
+  '_repr' : '__repr__')
+
+
+class PythonGeneratorVisitor is NodeVisitor
+  const importFrom = []  -- (module, name) tuples
+  const imports = []   -- Imports of form "import x"
+  const result = []
+  var curIndent = 0
+  var bol = True
+  const renamer
+  const types
+  var curMod = ''
+  
+  def create(renamer, types)
+    self.renamer = renamer
+    self.types = types
+  end
+  
+  def output()
+    var init = []
+    for i in imports
+      init.append('import {}'.format(i) + LF)
+    end
+    var map = Map()
+    var mods = []
+    for m, n in importFrom
+      if not map.hasKey(m)
+        mods.append(m)
+        map[m] = []
+      end
+      map[m].append(n)
+    end
+    for m in mods
+      if m != 'std'
+        init.append('from {} import {}'.format(
+                              m, ', '.join(Uniq(map[m]))) + LF)
+      end
+    end
+    return ''.join(init) + ''.join(self.result)
+  end
+
+  def visitAloreFile(o)
+    if o.header != nil
+      o.header.accept(self)
+    end
+    for d in o.defs
+      node(d)
+    end
+  end  
+  
+  def visitHeader(o)
+    curMod = o.id
+  end
+  
+  def visitTypeDef(o)
+    outputSeparator(o)
+    str('class {}'.format(o.name))
+    if o.info.typeVars != []
+      str('<{}>'.format(', '.join(o.info.typeVars)))
+    end
+    if o.base != nil and o.base.repr != nil
+      str('(')
+      node(o.base)
+      str(')')
+    end
+    str(':' + LF)
+    nodes(o.defs)
+    dedent()
+  end  
+  
+  def visitVarDef(o)
+    outputSeparator(o)
+    if o.kind == Mdef
+      str('member ')
+    end
+    var n = o.names.length()
+    if n == 1
+      if o.type != nil
+        type(o.type.type)
+        str(' ')
+      elif o.init is TypeApplication and o.kind != Gdef
+        type(types[o.init])
+        str(' ')
+      elif o.init == nil and o.kind != Mdef
+        str('any ')
+      end
+      node(o.names[0])
+    else
+      var t = nil
+      if o.type != nil
+        t = o.type.type.items
+      end
+      for i in 0 to n
+        if t != nil
+          type(t[i])
+          str(' ')
+        elif o.init == nil and o.kind != Mdef
+          str('any ')
+        end
+        node(o.names[i])
+        if i < n - 1
+          str(', ')
+        end
+      end        
+    end
+    if o.init != nil
+      str(' = ')
+      if o.init is ParenExpr and o.init.expr is CastExpr
+        node(o.init.expr)
+      else
+        node(o.init)
+      end
+    end
+    str(LF)
+  end
+  
+  def visitFuncDef(o)
+    if o.repr != nil
+      outputSeparator(o)
+    else
+      str(LF)
+    end
+    var t = nil
+    if o.type != nil
+      t = o.type.type
+    end
+    
+    if o.isAccessor()
+      outputAccessor(o, t)
+    elif t == nil or t is Callable
+      outputFunctionVariant(o, t)
+    else
+      var first = True
+      for sig in t.items()
+        if not first
+          str(LF)
+        end
+        outputFunctionVariant(o, sig)
+        first = False
+      end
+    end
+  end
+    
+  def outputFunctionVariant(o, t)
+    if t != nil
+      type(t.retType)
+      str(' ')
+    else
+      str('def ')
+    end
+    if o.info != nil
+      str(translateMember(o.name))
+    else
+      str(rename(o.fullName, o.name))
+    end
+    str('(')
+    if o.info != nil
+      str('self')
+      if o.args != []
+        str(', ')
+      end
+    end
+    for i in 0 to o.args.length()
+      if t != nil
+        type(t.argTypes[i])
+        str(' ')
+      end
+      node(o.args[i])
+      if o.init[i] != nil
+        str('=')
+        node(o.init[i].rvalue)
+      end
+      if i < o.args.length() - 1
+        str(', ')
+      end
+    end
+    str('):' + LF)
+    nodes(o.body)
+    dedent()
+  end
+  
+  def outputAccessor(o, t)
+    if o.isGetter
+      str('@property' + LF)
+      if t != nil
+        type(t)
+      else
+        str('def')
+      end
+      str(' ' + translateMember(o.name) + '()')
+    else
+      str('@{}.setter'.format(o.name) + LF)
+      if t != nil
+        str('void ')
+      else
+        str('def ')
+      end
+      str(translateMember(o.name) + '(')
+      if t != nil
+        type(t)
+        str(' ')
+      end
+      node(o.args[0])
+      str(')')
+    end
+    str(':' + LF)
+    nodes(o.body)
+    dedent()
+  end
+  
+  def visitVar(o)
+    if o.info != nil
+      str(translateMember(o.name))
+    else
+      str(rename(o.fullName, o.name))
+    end
+  end
+  
+  
+  -- Statements
+  
+  
+  def visitExpressionStmt(o)
+    node(o.expr); str(LF)
+  end
+  
+  def visitAssignmentStmt(o)
+    commaList(o.lvalues); str(' = '); node(o.rvalue); str(LF)
+  end
+  
+  def visitOperatorAssignmentStmt(o)
+    node(o.lvalue)
+    str(' ' + o.op + '= ')
+    node(o.rvalue)
+    str(LF)
+  end
+  
+  def visitReturnStmt(o)
+    str('return ')
+    node(o.expr)
+    str(LF)
+  end
+  
+  def visitWhileStmt(o)
+    str('while ')
+    node(o.expr)
+    str(':' + LF)
+    nodes(o.body)
+    dedent()
+  end
+  
+  def visitBreakStmt(o)
+    str('break' + LF)
+  end
+  
+  def visitRepeatStmt(o)
+    str('while True:' + LF)
+    nodes(o.body)
+    str('if ')
+    node(o.expr)
+    str(': break' + LF)
+    dedent()
+  end
+  
+  def visitIfStmt(o)
+    str('if ')
+    node(o.expr[0])
+    str(':' + LF)
+    nodes(o.body[0])
+    for i in 1 to o.expr.length()
+      dedent()
+      str('elif ')
+      node(o.expr[i])
+      str(':' + LF)
+      nodes(o.body[i])
+    end
+    if o.elseBody != nil
+      dedent()
+      str('else:' + LF)
+      nodes(o.elseBody)
+    end
+    dedent()
+  end
+  
+  def visitSwitchStmt(o)
+    -- TODO give better name
+    str('_x = '); node(o.expr); str(LF)
+    for i in 0 to o.cases.length()
+      if i == 0
+        str('if')
+      else
+        str('elif')
+      end
+      str(' _x')
+      if o.cases[i].length() == 1
+        str(' == ')
+        node(o.cases[i][0])
+      else
+        str(' in (')
+        var c = o.cases[i]
+        for j in 0 to c.length()
+          node(c[j])
+          if j < c.length() - 1
+            str(', ')
+          end
+        end
+        str(')')
+      end
+      str(':' + LF)
+      nodes(o.bodies[i])
+      dedent()
+    end
+    if o.bodies.length() > o.cases.length()
+      str('else:' + LF)
+      nodes(o.bodies[-1])
+      dedent()
+    end
+  end
+  
+  def visitTryExceptStmt(o)
+    str('try:' + LF)
+    nodes(o.body)
+    dedent()
+    for i in 0 to o.types.length()
+      str('except '); node(o.types[i])
+      if o.vars[i] != nil
+        str(' as '); node(o.vars[i])
+      end
+      str(':' + LF)
+      nodes(o.handlers[i])
+      dedent()      
+    end
+  end
+  
+  def visitTryFinallyStmt(o)
+    str('try:' + LF)
+    nodes(o.body)
+    dedent()
+    str('finally:' + LF)
+    nodes(o.finallyBody)
+    dedent()
+  end
+  
+  def visitForStmt(o)
+    str('for ')
+    for i in 0 to o.index.length()
+      if o.types[i] != nil
+        type(o.types[i].type)
+        str(' ')
+      end
+      node(o.index[i])
+      if i < o.index.length() - 1
+        str(', ')
+      end
+    end
+    str(' in ')
+    node(o.expr)
+    str(':' + LF)
+    nodes(o.body)
+    dedent()
+  end
+  
+  def visitRaiseStmt(o)
+    str('raise ')
+    node(o.expr)
+    str(LF)
+  end
+  
+  
+  -- Expressions
+  
+  
+  def visitNilExpr(o)
+    str('None')
+  end
+  
+  def visitIntExpr(o)
+    str(Str(o.value))
+  end
+  
+  def visitFloatExpr(o)
+    str(o.repr.float.str)
+  end
+  
+  def visitNameExpr(o)
+    if o.kind == Mdef
+      str('self.' + translateMember(o.name))
+    elif o.fullName in ('std::LF', 'std::Newline')
+      str("'\n'")
+    elif o.fullName == 'std::CR'
+      str("'\r'")
+    elif o.fullName == 'std::Tab'
+      str("'\t'")
+    else
+      str(rename(o.fullName, o.name))
+    end
+  end
+  
+  def visitNameLvalue(o)
+    visitNameExpr(o)
+  end
+  
+  def visitSelfExpr(o)
+    str('self')
+  end
+  
+  def visitOpExpr(o)
+    if o.op == 'is'
+      str('isinstance(')
+      node(o.left)
+      str(', ')
+      node(o.right)
+      str(')')
+    elif o.op == 'to'
+      str('range(')
+      if not (o.left is IntExpr and o.left.value == 0)
+        node(o.left)
+        str(', ')
+      end
+      node(o.right)
+      str(')')      
+    elif o.op == ':'
+      str('alore.pair(')
+      node(o.left)
+      str(', ')
+      node(o.right)
+      str(')')
+      addImport('alore')
+    elif o.op in ('==', '!=') and o.right is NilExpr
+      node(o.left)
+      str(' is ')
+      if o.op == '!='
+        str('not ')
+      end
+      str('None')
+    else
+      node(o.left); str(' ' + OpMap.get(o.op, o.op) + ' '); node(o.right)
+    end
+  end
+  
+  def visitUnaryExpr(o)
+    if o.op == '-'
+      str('-')
+    else
+      if o.expr is OpExpr and o.expr.op == 'in'
+        node(o.expr.left)
+        str(' not in ')
+        node(o.expr.right)
+        return
+      end
+      str('not ')
+    end
+    node(o.expr)
+  end
+  
+  def visitStrExpr(o)
+    var orig = o.repr.str.str
+    var r = ''
+    var q = orig[0]
+    var lit = orig[1:-1].replace(q + q, q)
+    if not "'" in lit
+      q = "'"
+    end
+    for i in 0 to lit.length()
+      var ch = lit[i]
+      if ch == q
+        r += '\' + ch
+      elif ch == '\' and lit[i + 1:i + 2] == 'u'
+        -- TODO does not work 100%
+        r += '\'
+      elif ch == '\'
+        r += '\\'
+      else
+        r += ch
+      end
+    end
+    str(q + r + q)
+  end
+  
+  def visitParenExpr(o)
+    str('('); node(o.expr); str(')')
+  end
+  
+  def visitIndexExpr(o)
+    node(o.base); str('[')
+    if o.index is OpExpr and o.index.op == ':'
+      var l, r = o.index.left, o.index.right
+      if not l is NilExpr
+        node(l)
+      end
+      str(':')
+      if not r is NilExpr
+        node(r)
+      end
+    else
+      node(o.index); 
+    end
+    str(']')
+  end
+  
+  def visitIndexLvalue(o)
+    visitIndexExpr(o)
+  end
+  
+  def visitMemberExpr(o)
+    node(o.expr); str('.' + translateMember(o.name))
+  end
+  
+  def visitMemberLvalue(o)
+    visitMemberExpr(o)
+  end
+  
+  def visitCallExpr(o)
+    if trySpecialCall(o)
+      return
+    end
+    node(o.callee)
+    str('(')
+    for i in 0 to o.args.length()
+      if i == o.args.length() - 1 and o.isVarArg
+        str('*')
+      end
+      node(o.args[i])
+      if i < o.args.length() - 1
+        str(', ')
+      end
+    end
+    str(')')
+  end
+  
+  def trySpecialCall(o)
+    if o.callee is MemberExpr and o.callee.name == 'length' and
+       o.args.length() == 0
+      str('len(')
+      node(o.callee.expr)
+      str(')')
+      return True
+    elif o.callee is NameExpr and o.callee.fullName == 'std::Map'
+      str('{')
+      var i = 0
+      for a in o.args
+        if a is OpExpr and a.op == ':'
+          node(a.left)
+          str(': ')
+          node(a.right)
+        else
+          node(a)
+        end
+        i += 1
+        if i < o.args.length()
+          str(', ')
+        end
+      end      
+      str('}')
+      return True
+    end
+    return False
+  end
+  
+  def visitTupleExpr(o)
+    var n = o.items.length()
+    if n == 0
+      str('()')
+    else
+      for i in 0 to n
+        node(o.items[i])
+        if i < n - 1
+          str(', ')
+        elif n == 1
+          str(',')
+        end
+      end
+    end
+  end
+  
+  def visitArrayExpr(o)
+    str('[')
+    commaList(o.items)
+    str(']')
+  end
+  
+  def visitSuperExpr(o)
+    str('super().' + translateMember(o.name))
+  end
+  
+  def visitTypeApplication(o)
+    node(o.expr)
+  end
+  
+  def visitCastExpr(o)
+    str('(')
+    if o.typeName.name == 'dynamic'
+      str('any')
+    else
+      node(o.typeName)
+    end
+    str(')')
+    if o.expr is IndexExpr or o.expr is CallExpr or o.expr is MemberExpr or
+         o.expr is NameExpr
+      node(o.expr)
+    else
+      str('(')
+      node(o.expr)
+      str(')')
+    end
+  end
+
+  
+  -- Helpers
+  
+  
+  def str(s, allowIndent = True)
+    if self.bol
+      self.result.append(' ' * self.curIndent)
+    end
+    self.result.append(s)
+    if s.endsWith(':' + LF) and allowIndent
+      self.curIndent += Indent
+    end
+    self.bol = s.endsWith(LF)
+  end
+  
+  def dedent()
+    self.curIndent -= Indent
+  end
+  
+  def commaList(a)
+    for i in 0 to a.length()
+      node(a[i])
+      if i < a.length() - 1
+        str(', ')
+      end
+    end
+  end
+
+  -- Output a node.
+  def node(n)
+    if n != nil
+      n.accept(self)
+    end
+  end
+
+  -- Output an array of nodes.
+  def nodes(a)
+    if a == []
+      str('pass' + Newline)
+    else
+      for n in a
+        node(n)
+      end
+    end
+  end
+  
+  def type(t)
+    str(t.accept(PyTypeStrVisitor(self.rename)))
+  end
+  
+  def translateMember(n)
+    if MemberMap.hasKey(n)
+      return MemberMap[n]
+    else
+      return renameMember(n)
+    end
+  end
+  
+  def rename(full, name)
+    var n = self.renamer.rename(full)
+    if n == nil
+      n = full
+    else
+      if '.' in n
+        var m = Match('(.*)\.[a-zA-Z0-9_]+', n)
+        addImport(m.group(1))
+      end
+    end
+    if '::' in n
+      var c = n.split('::')
+      if '::'.join(c[:-1]) != curMod
+        importFrom.append(('.'.join(c[:-1]), c[-1]))
+      end
+      n = c[-1]
+    end
+    return n
+  end
+  
+  def renameMember(name)
+    var n = self.renamer.renameMember(name)
+    if n == nil
+      return name
+    else
+      return n
+    end
+  end
+  
+  def addImport(m)
+    if not m in imports
+      imports.append(m)
+    end
+  end
+  
+  def outputSeparator(o)
+    var s = GetSeparator(o)
+    if s != ''
+      for l in s.split(LF)[:-1]
+        str(l + LF, False) 
+      end
+    end
+  end
+end
+
+
+class PyTypeStrVisitor is TypeVisitor<Str>
+  const rename
+
+  def create(ren)
+    self.rename = ren
+  end
+
+  def visitVoid(t)
+    return 'void'
+  end
+  
+  def visitDynamic(t)
+    return 'any'
+  end
+  
+  def visitTypeVar(t)
+    return t.name
+  end
+  
+  def visitInstance(t)
+    var s = rename(t.type.fullName, t.type.name)
+    if t.args != []
+      var aa = []
+      for a in t.args
+        aa.append(a.accept(self))
+      end
+      s += '<{}>'.format(', '.join(aa))
+    end
+    return s
+  end
+  
+  def visitTupleType(t)
+    if t.items == []
+      return 'tuple'
+    else
+      var a = []
+      for i in t.items
+        a.append(i.accept(self))
+      end
+      return 'tuple<{}>'.format(', '.join(a))
+    end
+  end
+  
+  def visitCallable(t)
+    return 'callable' -- TODO fix
+  end
+end
+
+
+def Uniq(l)
+  var seen = Set()
+  var r = []
+  for i in l
+    if not i in seen
+      seen.add(i)
+      r.append(i)
+    end
+  end
+  return r
+end

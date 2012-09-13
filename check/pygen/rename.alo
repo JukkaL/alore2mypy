@@ -1,0 +1,121 @@
+module pygen
+
+import io
+import os
+import re
+import nodes
+
+
+class PythonRenamer
+  var members = Map()
+  var names = Map()
+
+  def create(path = 'pygen')
+    if not IsDir(path)
+      path = Join('../check', path)
+    end
+    members = loadMap(path, 'member-rename.txt')
+    names = loadMap(path, 'rename.txt')
+  end
+  
+  def update(map, memberMap)
+    for old, new in map
+      if not names.hasKey(old)
+        names[old] = new
+      end
+    end
+    for old, new in memberMap
+      if not members.hasKey(old)
+        members[old] = new
+      end
+    end
+  end
+
+  def renameMember(n)
+    return members.get(n, nil)
+  end
+  
+  def rename(n)
+    return names.get(n, nil)
+  end
+  
+  def loadMap(dir, fnam)
+    var m = Map()
+    var f = File(Join(dir, fnam))
+    for s in f
+      var ss = s.strip()
+      if ss != '' and not ss.startsWith('#')
+        var old, new = ss.split()
+        m[old] = new
+      end
+    end
+    f.close() 
+    return m
+  end
+end
+
+
+def BuildRenameMaps(trees)
+  var r = RenameSuggestionVisitor()
+  for t in trees
+    t.accept(r)
+  end
+  return r.map, r.memberMap
+end
+
+
+class RenameSuggestionVisitor is TraverserVisitor
+  var map = Map()
+  var memberMap = Map()
+
+  def visitFuncDef(o)
+    add(o.name, o.info != nil, o.fullName)
+    for v in o.args
+      add(v.name, False)
+    end
+  end
+  
+  def visitVarDef(o)
+    for v in o.names
+      var isConst = False
+      if o.kind == Gdef and o.isConst
+        if o.init == nil
+          isConst = True
+        elif o.init is StrExpr or o.init is IntExpr
+          isConst = True
+        end
+      end
+      add(v.name, o.kind == Mdef, v.fullName, isConst)
+    end
+  end
+  
+  def add(name, isMember, fullName = name, isConst = False)
+    if fullName == nil
+      fullName = name
+    end
+    var prefix = '::'.join(fullName.split('::')[:-1])
+    if prefix != ''
+      prefix += '::'
+    end
+    var n = normalize(name)
+    if isConst
+      n = n.upper()
+    end
+    if isMember
+      memberMap[name] = n
+    else
+      --map[name] = n
+      map[fullName] = prefix + n
+    end    
+  end
+  
+  def normalize(n)
+    n = Subst(n, '^([A-Z])', 
+                     def (m); return m.group(1).lower(); end)
+    n = Subst(n, '([a-z0-9])([A-Z])', 
+                     def (m)
+                       return m.group(1) + '_' + m.group(2).lower()
+                     end)
+    return n
+  end
+end

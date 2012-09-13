@@ -1,0 +1,85 @@
+import unittest
+import analyse
+import errors
+import helpers
+import pygen
+import re, os
+
+
+-- Files which contain test case descriptions.
+const PygenFiles = ["pygen.test"]
+const TestDataPrefix = "test"
+const TestTempDir = "tmp"
+
+
+class PygenSuite is Suite
+  def cases()
+    var c = []
+    for f in PygenFiles
+      c += ParseTestCases(Join(TestDataPrefix, f), TestPygen,
+                          TestTempDir, True)
+    end
+    return c
+  end
+end
+
+
+private def TestPygen(testcase)
+  var a
+  var expected = testcase.output
+  try
+    var src = LF.join(testcase.input)
+    -- Parse and analyse the source program.
+    var trees, symtable, infos, types =
+                 Analyse(src, "main", False, TestTempDir, True)
+    a = []
+    var first = True
+    for t in trees
+      -- Omit the std module and files marked for omission.
+      if not t.path.endsWith(Separator + "std.alo") and not "-skip." in t.path
+        -- Add file name + colon for files other than the first.
+        if not first
+          a.append("{}:".format(FixPath(RemovePrefix(t.path, TestTempDir))))
+        end
+
+        var ren = PythonRenamer()
+        var v = PythonGeneratorVisitor(ren, types)
+        t.accept(v)
+        var s = v.output().strip()
+        if s != ""
+          a += s.split(LF)
+        end
+      end
+      first = False
+    end
+  except e is CompileError
+    a = e.messages
+  end
+  for i in 0 to Min(expected.length(), a.length())
+    expected[i] = Subst(expected[i], ' +$', '')
+    a[i] = Subst(a[i], ' +$', '')
+  end
+  AssertStringArraysEqual(expected, a,
+                          "Invalid output ({}, line {})".format(
+                            testcase.file, testcase.line))
+end
+
+
+private def RemovePrefix(path, prefix)
+  var regexp = "^" + prefix.replace('\', '\\')
+  var np = Subst(path, regexp, "")
+  if np.startsWith(Separator)
+    np = np[1:]
+  end
+  return np
+end
+
+
+private def FixPath(path)
+  return path.replace('\', '/')
+end
+
+
+def Main(args)
+  RunTest(PygenSuite(), args)
+end

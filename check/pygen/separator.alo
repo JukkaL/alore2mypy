@@ -1,0 +1,42 @@
+module pygen
+
+import nodes
+import reflect
+import re
+
+
+const SepMap = Map(
+  VarDef : ['visibility', 'type'],
+  FuncDef : ['visibility', 'defTok'],
+  TypeDef : ['visibility', 'type'])
+
+
+def GetSeparator(o)
+  if o.repr == nil
+    return ''
+  end
+  var toks = []
+  for member in SepMap.get(TypeOf(o), [])
+    toks.append(GetMember(o.repr, member))
+  end
+  return GetSep(toks)
+end
+
+
+private def GetSep(toks)
+  for t in toks
+    if t.str != ''
+      return Process(t.pre)
+    end
+  end
+  return ''
+end
+
+
+private def Process(pre)
+  pre = Subst(pre, '--([^\n\r]*)', '#\1')
+  pre = Subst(pre, '^ +', '')
+  pre = Subst(pre, ' +([\n#])', '\1')
+  pre = Subst(pre, ' +$', '')
+  return pre
+end

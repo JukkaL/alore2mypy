@@ -1,0 +1,20 @@
+module std
+
+-- Std module stub used in Array-related test cases.
+
+class Object
+end
+
+class Type
+end
+
+class Int
+end
+
+class Boolean
+end
+
+class Array<T>
+  def _in(x as Object) as Boolean
+  end
+end

@@ -1,0 +1,878 @@
+[case testEmpty]
+[out]
+
+
+[case testNil]
+nil
+[out]
+None
+
+
+[case testEmptyClass]
+class A
+end
+class Boo
+end
+[out]
+class A:
+    pass
+class Boo:
+    pass
+
+
+[case testGlobalVarDef]
+var a
+var b as A
+var c = b as A
+var d = c
+class A
+end
+[out]
+any a
+A b
+A c = b
+d = c
+class A:
+    pass
+    
+    
+[case testGlobalConst]
+const a = 1
+const b = a
+[out]
+a = 1
+b = a
+
+
+[case testAssignment]
+var a
+a = a
+[out]
+any a
+a = a
+
+
+[case testExpressions]
+def f()
+  1 + 13 * 26 - 4
+  -1 / 3 div 4 mod 6
+  1 == 2
+  1 != 2
+  1 < 2
+  2 <= 3
+  3 > 4
+  3 >= 5
+end
+[out]
+def f():
+    1 + 13 * 26 - 4
+    -1 / 3 // 4 % 6
+    1 == 2
+    1 != 2
+    1 < 2
+    2 <= 3
+    3 > 4
+    3 >= 5
+
+
+[case testFloatLiterals]
+123.456 
+1e55 
+1e-4 
+1e+5
+[usestd fixtures/std-primitives.alo]
+[out]
+123.456
+1e55
+1e-4
+1e+5
+
+
+[case testStrLiterals]
+''
+""
+'foo'
+"Bar" 
+'''f''g'
+"g""y" 
+"\"
+'\f\'
+'\u1234'
+"'"
+[usestd fixtures/std-primitives.alo]
+[out]
+''
+''
+'foo'
+'Bar'
+'\'f\'g'
+'g"y'
+'\\'
+'\\f\\'
+'\u1234'
+"'"
+--'
+
+[case testBooleanOps]
+def f()
+  not 1 > 2
+  1 < 2 and 1 == 2 or 2 == 3
+end
+[out]
+def f():
+    not 1 > 2
+    1 < 2 and 1 == 2 or 2 == 3
+
+
+[case testParens]
+def f()
+  (1 + 2) * ((3))
+end
+[out]
+def f():
+    (1 + 2) * ((3))
+
+
+[case testIndexing]
+def f()
+  1[2]
+  2[1] = 2
+end
+[out]
+def f():
+    1[2]
+    2[1] = 2
+
+
+[case testMemberAccess]
+var a
+a.f
+a.x = 3
+[out]
+any a
+a.f
+a.x = 3
+
+
+[case testSimpleCalls]
+var a
+a()
+a(1)
+a(1, 2)
+[out]
+any a
+a()
+a(1)
+a(1, 2)
+
+
+[case testFuncDef]
+def f()
+  return 1
+end
+def g(x)
+  x.foo()
+end
+def h(x, y)
+end
+[out]
+def f():
+    return 1
+def g(x):
+    x.foo()
+def h(x, y):
+    pass
+
+
+[case testFuncDefWithTypes]
+def f(a as A) as B
+end
+def g() as void
+end
+def h(a, b as A)
+end
+class A
+end
+class B
+end
+[out]
+B f(A a):
+    pass
+void g():
+    pass
+void h(any a, A b):
+    pass
+class A:
+    pass
+class B:
+    pass
+
+
+[case testFuncWithDefaultArgs]
+def f(x = 1, y = 1 + 2)
+end
+[out]
+def f(x=1, y=1 + 2):
+    pass
+
+
+[case testControlStructures]
+def f()
+  if 1
+    2
+  elif 2
+    3
+  else
+    4
+  end
+  while 1
+    2
+    break
+  end
+  repeat
+    1
+  until 2
+end
+[out]
+def f():
+    if 1:
+        2
+    elif 2:
+        3
+    else:
+        4
+    while 1:
+        2
+        break
+    while True:
+        1
+        if 2: break
+
+
+[case testNestedBlocks]
+def f()
+  if 1
+    while 2
+      3
+    end
+  end
+  return 2
+end
+[out]
+def f():
+    if 1:
+        while 2:
+            3
+    return 2
+
+
+[case testMethods]
+class A
+  def f()
+    return 1
+  end
+  def g(x)
+  end
+  def h(a as A) as A
+  end
+end
+[out]
+class A:
+    def f(self):
+        return 1
+    def g(self, x):
+        pass
+    A h(self, A a):
+        pass
+
+
+[case testMemberVarAndAutomaticConstructor]
+class A
+  var x
+  var y = 4
+  var z as A
+end
+[out]
+class A:
+    member x
+    member y = 4
+    member A z
+    
+    void __init__(self, any x, A z):
+        self.x = x
+        self.z = z
+
+
+[case caseTestMemberAccessAndSelf]
+class A
+  var x = nil
+  def f()
+    x
+    x = 1
+    self.x = 1
+    f()
+    self.f()
+  end
+end
+[out]
+class A:
+    member x = None
+    def f(self):
+        self.x
+        self.x = 1
+        self.x = 1
+        self.f()
+        self.f()
+
+
+[case testConstructor]
+class A
+  def create()
+  end
+end
+[out]
+class A:
+    def __init__(self):
+        pass
+
+
+[case testTupleExpression]
+1, 2, 3
+()
+(1,)
+(2, 3)
+[out]
+1, 2, 3
+()
+(1,)
+(2, 3)
+
+
+[case testArrayExpression]
+([])
+([1])
+([1, 2])
+[usestd fixtures/std-array.alo]
+[out]
+([])
+([1])
+([1, 2])
+
+
+[case testInOperator]
+1 in [1, 2]
+not 1 in [1, 2]
+[usestd fixtures/std-array.alo]
+[out]
+1 in [1, 2]
+1 not in [1, 2]
+
+
+[case testIsOperator]
+1 is A
+class A
+end
+[usestd fixtures/std-primitives.alo]
+[out]
+isinstance(1, A)
+class A:
+    pass
+
+
+[case testToOperator]
+0 to 5
+2 to 4
+[usestd fixtures/std-primitives.alo]
+[out]
+range(5)
+range(2, 4)
+
+
+[case testVarArgCall]
+var f
+f(*[1, 2])
+f(1, *[1, 2])
+[usestd fixtures/std-array.alo]
+[out]
+any f
+f(*[1, 2])
+f(1, *[1, 2])
+
+
+[case testTryExcept]
+try
+  nil
+except ValueError
+  (nil)
+except e is Exception
+  ((nil))
+end
+[usestd fixtures/std-exception.alo]
+[out]
+try:
+    None
+except ValueError:
+    (None)
+except Exception as e:
+    ((None))
+
+[case testTryFinally]
+try
+  nil
+finally
+  var x = nil
+end
+[out]
+try:
+    None
+finally:
+    x = None
+
+
+[case testFor]
+for x in [1]
+  2
+end
+var d as dynamic
+for x, y in d
+end
+for x as Object in []
+end
+[usestd fixtures/std-for.alo]
+[out]
+for x in [1]:
+    2
+any d
+for x, y in d:
+    pass
+for object x in []:
+    pass
+
+
+[case testMultipleDefAndAssign]
+var x, y, z
+x, y[1], z = z
+var a, b as (Object, Object)
+[usestd fixtures/std-primitives.alo]
+[out]
+any x, any y, any z
+x, y[1], z = z
+object a, object b
+
+
+[case testGenericTypes]
+var a as A<Object>
+var b as B<A<dynamic>, dynamic>
+class A<T>
+  def f() as T
+  end
+end
+class B<T, S>
+end
+[out]
+A<object> a
+B<A<any>, any> b
+class A<T>:
+    T f(self):
+        pass
+class B<T, S>:
+    pass
+
+
+[case testTupleTypes]
+var t0 as ()
+var t1 as (Object,)
+var t2 as (Object, dynamic)
+[out]
+tuple t0
+tuple<object> t1
+tuple<object, any> t2
+
+
+[case testRenaming]
+import math
+math::Sin(1.0)
+var x = Sin(1.0)
+var o as std::Object
+if x.startsWith('foo')
+end
+class A
+  def startsWith()
+    startsWith()
+  end
+end
+[file math/m-skip.alo]
+module math
+def Sin(x)
+end
+[usestd fixtures/std-primitives.alo]
+[out]
+import math
+math.sin(1.0)
+x = math.sin(1.0)
+object o
+if x.startswith('foo'):
+    pass
+class A:
+    def startswith(self):
+        self.startswith()
+
+
+[case testMain]
+def Main(args)
+end
+[out]
+def main(args):
+    pass
+    
+    
+[case testLength]
+'foo'.length()
+[usestd fixtures/std-primitives.alo]
+[out]
+len('foo')
+
+
+[case testSuperclass]
+class A is Object
+end
+[out]
+class A(object):
+    pass
+
+
+[case testIntersectionTypes]
+def f(a as A) as A or
+     (a as B) as B
+  return a
+end
+class A
+end
+class B
+end
+[out]
+A f(A a):
+    return a
+
+B f(B a):
+    return a
+class A:
+    pass
+class B:
+    pass
+
+
+[case testRaiseStatement]
+raise Exception()
+[usestd fixtures/std-exception.alo]
+[out]
+raise Exception()
+
+
+[case testWhiteSpace]
+var x = A()
+
+var y = A()
+
+def f()
+end
+
+class A
+end
+[out]
+x = A()
+
+y = A()
+
+def f():
+    pass
+
+class A:
+    pass
+
+
+[case testComments]
+---- Foo
+var x
+
+----Bar
+def f()
+end
+
+---- Yes
+---- ---
+class A
+  -- Foo
+  -- Bar
+  def f()
+  end
+end
+[out]
+# Foo
+any x
+
+#Bar
+def f():
+    pass
+
+# Yes
+# ---
+class A:
+    # Foo
+    # Bar
+    def f(self):
+        pass
+
+
+[case testColonInComment]
+---- Foo:
+----  Bar
+var x
+[out]
+# Foo:
+#  Bar
+any x
+
+
+[case testDictExpression]
+var m0 = Map()
+var m1 = Map(1: 'foo')
+var m2 = Map('x': 'y', 'z': 'y')
+[file std/std.alo]
+module std
+class Object
+end
+class Int
+end
+class Str
+end
+class Array<T>
+end
+class Map<K, V>
+  def create(*a as Pair<K, V>)
+  end
+end
+class Pair<F, S>
+end
+class Type
+end
+[out]
+m0 = {}
+m1 = {1: 'foo'}
+m2 = {'x': 'y', 'z': 'y'}
+
+
+[case testTypeApplication]
+def f() as void
+  var a = A() as <Object>
+  A() as <Object>
+end
+class A<T>
+  var m = [] as <Object>
+end
+[usestd fixtures/std-array.alo]
+[out]
+void f():
+    A<object> a = A()
+    A()
+class A<T>:
+    member list<object> m = []
+
+
+[case testSlices]
+def f(x)
+  x[1:2]
+  x[:1]
+  x[1:]
+end
+[out]
+def f(x):
+    x[1:2]
+    x[:1]
+    x[1:]
+
+
+[case testEqualToNil]
+def f(x)
+  if x == nil
+  elif x != nil
+  end
+end
+[out]
+def f(x):
+    if x is None:
+        pass
+    elif x is not None:
+        pass
+
+
+[case testOperatorAssignment]
+var x
+x += 1
+x -= 1
+x *= 1
+x /= 1
+[out]
+any x
+x += 1
+x -= 1
+x *= 1
+x /= 1
+
+
+[case testSwitch]
+switch 4
+  case 1
+    2
+  case 2, 3
+    3
+  else
+    4
+end
+switch 2
+  case 2
+    3
+end
+[out]
+_x = 4
+if _x == 1:
+    2
+elif _x in (2, 3):
+    3
+else:
+    4
+_x = 2
+if _x == 2:
+    3
+
+
+[case testAccessors]
+class A
+  def x
+    return 1
+  end
+  def x = y
+    nil
+  end
+  def xx as Object
+    return 1
+  end
+  def xx = y as Object
+    nil
+  end
+end
+[out]
+class A:
+    @property
+    def x():
+        return 1
+    @x.setter
+    def x(y):
+        None
+    @property
+    object xx():
+        return 1
+    @xx.setter
+    void xx(object y):
+        None
+
+
+[case testCasts]
+var x
+(x as A).m
+x(x() as A)
+x(x.y as A)
+x(x + x as A)
+x(x[1] as A)
+x as dynamic
+var y = (x as A)
+class A
+  var m = nil
+end
+[out]
+any x
+((A)x).m
+x((A)x())
+x((A)x.y)
+x((A)(x + x))
+x((A)x[1])
+(any)x
+y = (A)x
+class A:
+    member m = None
+
+
+[case testSuperclassReference]
+class A
+  def f(x)
+  end
+end
+class B is A
+  def create() as void
+    super.create()
+    super.f(self)
+  end
+end
+[out]
+class A:
+    def f(self, x):
+        pass
+class B(A):
+    void __init__(self):
+        super().__init__()
+        super().f(self)
+
+[case testPairExpr]
+def f()
+  var a = 1 : 3
+end
+[out]
+import alore
+def f():
+    a = alore.pair(1, 3)
+
+
+[case testImports]
+import x
+x::f
+g
+var a as A
+class C is x::B
+end
+[file x/x-skip.alo]
+module x
+def f()
+end
+var g
+class A
+end
+class B
+end
+[out]
+from x import f, g, A, B
+f
+g
+A a
+class C(B):
+    pass
+    
+    
+[case testImportsInModule]
+import x
+[file x/x.alo]
+module x
+import y
+a
+A()
+class A
+end
+[file y/y-skip.alo]
+module y
+var a
+[out]
+x/x.alo:
+from y import a
+a
+A()
+class A:
+    pass

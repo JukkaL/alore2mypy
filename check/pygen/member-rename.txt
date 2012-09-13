@@ -1,0 +1,5 @@
+startsWith      startswith
+endsWith        endswith
+hasKey          has_key
+readLines       readlines
+insertAt        insert
