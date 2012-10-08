@@ -645,9 +645,9 @@ any x
 
 
 [case testDictExpression]
-var m0 = Map()
-var m1 = Map(1: 'foo')
-var m2 = Map('x': 'y', 'z': 'y')
+var m0 = Map() as <dynamic, dynamic>
+var m1 = Map(1: 'foo') as <dynamic, dynamic>
+var m2 = Map('x': 'y', 'z': 'y') as <dynamic, dynamic>
 [file std/std.alo]
 module std
 class Object

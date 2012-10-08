@@ -10,3 +10,9 @@ end
 
 class Int -- Can use integer literals
 end
+
+class Boolean
+end
+
+class Pair<L, R>
+end
