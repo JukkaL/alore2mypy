@@ -898,3 +898,17 @@ end
 a = 1  # Foo
 def f(x):  # Hello
     x = 1
+
+[case testCommentAfter]
+var x
+x = 1 -- Foo
+x -- X
+class X    -- Bar
+end
+[out]
+any x
+x = 1 # Foo
+x # X
+class X:    # Bar
+    pass
+

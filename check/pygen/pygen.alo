@@ -80,7 +80,7 @@ class PythonGeneratorVisitor is NodeVisitor
       node(o.base)
       str(')')
     end
-    str(':' + LF)
+    str(':' + GetAfterComment(o) + LF, True, True)
     nodes(o.defs)
     dedent()
   end  
@@ -239,11 +239,15 @@ class PythonGeneratorVisitor is NodeVisitor
   
   
   def visitExpressionStmt(o)
-    node(o.expr); str(LF)
+    node(o.expr)
+    outputAfterComment(o)
+    str(LF)
   end
   
   def visitAssignmentStmt(o)
-    commaList(o.lvalues); str(' = '); node(o.rvalue); str(LF)
+    commaList(o.lvalues); str(' = '); node(o.rvalue)
+    outputAfterComment(o)
+    str(LF)
   end
   
   def visitOperatorAssignmentStmt(o)

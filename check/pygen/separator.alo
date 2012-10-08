@@ -47,7 +47,10 @@ end
 
 const AfterCommentMap = Map(
   VarDef : 'br',
-  FuncDef : 'defBr')
+  FuncDef : 'defBr',
+  TypeDef : 'headerBr',
+  AssignmentStmt : 'br',
+  ExpressionStmt : 'br')
 
   
 def GetAfterComment(o)
