@@ -9,13 +9,13 @@ import set
 const Indent = 4
 
 
-const OpMap = Map('div' : '//', 'mod' : '%')
+const OpMap = Map('div' : '//', 'mod' : '%') as Map<Str, Str>
 
 
 const MemberMap = Map(
   'create' : '__init__',
   '_str' : '__str__',
-  '_repr' : '__repr__')
+  '_repr' : '__repr__') as Map<Str, Str>
 
 
 class PythonGeneratorVisitor is NodeVisitor

@@ -8,7 +8,7 @@ import re
 const SepMap = Map(
   VarDef : ['visibility', 'type'],
   FuncDef : ['visibility', 'defTok'],
-  TypeDef : ['visibility', 'type'])
+  TypeDef : ['visibility', 'type']) as Map<Type, Array<Str>>
 
 
 def GetSeparator(o)
