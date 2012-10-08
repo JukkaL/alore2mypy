@@ -10,15 +10,22 @@ end
 
 
 def Main(args)
-  if args.length() != 1
-    WriteLn("Usage: pgen.alo PROGRAM")
+  if args.length() < 1
+    WriteLn("Usage: pgen.alo [--no-check] PROGRAM")
     Exit(1)
+  end
+  
+  var isCheck = True
+  if args[0] == "--no-check"
+    isCheck = False
+    args = args[1:]
   end
 
   try
     var src = File(args[0]).read()
     -- Parse and analyse the program.
-    var trees, symtable, types, typemap = Analyse(src, args[0], True, "", True)
+    var trees, symtable, types, typemap = Analyse(src, args[0], True, "", 
+                                                  isCheck)
     var map, memberMap = BuildRenameMaps(trees)
     var r = PythonRenamer()
     r.update(map, memberMap)
