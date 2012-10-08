@@ -5,6 +5,9 @@ import reflect
 import re
 
 
+-- Extract and convert whitespace/comments before/after a node.
+
+
 const SepMap = Map(
   VarDef : ['visibility', 'type'],
   FuncDef : ['visibility', 'defTok'],
@@ -39,4 +42,20 @@ private def Process(pre)
   pre = Subst(pre, ' +([\n#])', '\1')
   pre = Subst(pre, ' +$', '')
   return pre
+end
+
+
+const AfterCommentMap = Map(
+  VarDef : 'br',
+  FuncDef : 'defBr')
+
+  
+def GetAfterComment(o)
+  var m = AfterCommentMap.get(TypeOf(o), nil)
+  if o.repr == nil or m == nil
+    return ''
+  end
+  var cc = GetMember(o.repr, m).pre
+  cc = cc.replace('--', '#')
+  return cc
 end

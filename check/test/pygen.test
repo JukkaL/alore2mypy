@@ -832,6 +832,7 @@ class B(A):
         super().__init__()
         super().f(self)
 
+
 [case testPairExpr]
 def f()
   var a = 1 : 3
@@ -886,3 +887,14 @@ a
 A()
 class A:
     pass
+
+
+[case testCommentAfterDef]
+var a = 1  -- Foo
+def f(x)  -- Hello
+  x = 1
+end
+[out]
+a = 1  # Foo
+def f(x):  # Hello
+    x = 1

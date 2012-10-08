@@ -128,6 +128,7 @@ class PythonGeneratorVisitor is NodeVisitor
         node(o.init)
       end
     end
+    outputAfterComment(o)
     str(LF)
   end
   
@@ -191,7 +192,7 @@ class PythonGeneratorVisitor is NodeVisitor
         str(', ')
       end
     end
-    str('):' + LF)
+    str('):' + GetAfterComment(o) + LF, True, True)
     nodes(o.body)
     dedent()
   end
@@ -626,12 +627,12 @@ class PythonGeneratorVisitor is NodeVisitor
   -- Helpers
   
   
-  def str(s, allowIndent = True)
+  def str(s, allowIndent = True, forceIndent = False)
     if self.bol
       self.result.append(' ' * self.curIndent)
     end
     self.result.append(s)
-    if s.endsWith(':' + LF) and allowIndent
+    if (s.endsWith(':' + LF) or forceIndent) and allowIndent 
       self.curIndent += Indent
     end
     self.bol = s.endsWith(LF)
@@ -721,6 +722,13 @@ class PythonGeneratorVisitor is NodeVisitor
       for l in s.split(LF)[:-1]
         str(l + LF, False) 
       end
+    end
+  end
+  
+  def outputAfterComment(o)
+    var s = GetAfterComment(o)
+    if s != ''
+      str(s)
     end
   end
 end
