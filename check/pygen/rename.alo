@@ -4,6 +4,7 @@ import io
 import os
 import re
 import nodes
+import sys
 
 
 class PythonRenamer
@@ -12,7 +13,7 @@ class PythonRenamer
 
   def create(path = 'pygen')
     if not IsDir(path)
-      path = Join('../check', path)
+      path = Join(DirName(ProgramPath), path)
     end
     members = loadMap(path, 'member-rename.txt')
     names = loadMap(path, 'rename.txt')
