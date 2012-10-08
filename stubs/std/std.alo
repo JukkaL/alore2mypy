@@ -48,8 +48,7 @@ end
 
 -- Primitive types
 
-class Int implements Comparable<Int>, Comparable<Float>,
-                     Comparable<Comparable<Int>> -- {not nil} FIX
+class Int implements Comparable<Int> -- {not nil} FIX
   -- FIX: _int method
   def create(obj as Str, base = nil as Int) or
             (obj as Object)
@@ -196,8 +195,7 @@ class Str implements Comparable<Str>, Sequence<Str>, Iterable<Str>,
   end
 end
 
-class Float implements Comparable<Float>, Comparable<Int>,
-                       Comparable<Comparable<Float>> -- {not nil} FIX
+class Float implements Comparable<Float> -- {not nil} FIX
   -- FIX: _float method
   def create(obj as Object)
   end
@@ -381,7 +379,7 @@ class Array<T> implements Comparable<Array<T>>, Sequence<T>, Iterable<T>,
   def _mul(n as Int) as Array<T>
   end
 
-  def _add<S is T>(x as Array<S>) as Array<T>
+  def _add(x as Array<T>) as Array<T>
   end
 
   def _in(x as Object) as Boolean
@@ -587,4 +585,12 @@ end
 class ExitException is Exception
   def create(code as Int)
   end
+end
+
+
+-- Used for testing dynamic checking transformation.
+def __Print(*a)
+end
+
+def __Assert(actual, expected)
 end
