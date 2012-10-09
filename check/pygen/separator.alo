@@ -11,7 +11,18 @@ import re
 const SepMap = Map(
   VarDef : ['visibility', 'type'],
   FuncDef : ['visibility', 'defTok'],
-  TypeDef : ['visibility', 'type']) as Map<Type, Array<Str>>
+  TypeDef : ['visibility', 'type'],
+  WhileStmt : ['whileTok'],
+  RepeatStmt : ['repeatTok'],
+  BreakStmt : ['breakTok'],
+  ForStmt : ['forTok'],
+  IfStmt : ['ifTok'],
+  ReturnStmt : ['returnTok'],  
+  
+  NameExpr : ['components'],
+  NameLvalue : ['lparens', 'base.components'],
+  
+  ) as Map<Type, Array<Str>>
 
 
 def GetSeparator(o)
@@ -20,9 +31,24 @@ def GetSeparator(o)
   end
   var toks = []
   for member in SepMap.get(TypeOf(o), [])
-    toks.append(GetMember(o.repr, member))
+    var t = GetMembers(o.repr, member)
+    if t is Array
+      if t != []
+        toks.append(t[0])
+      end
+    else
+      toks.append(t)
+    end
   end
   return GetSep(toks)
+end
+
+
+def GetMembers(o, ms)
+  for m in ms.split('.')
+    o = GetMember(o, m)
+  end
+  return o
 end
 
 

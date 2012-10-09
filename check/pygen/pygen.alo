@@ -245,12 +245,14 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitAssignmentStmt(o)
+    outputSeparator(o.lvalues[0])
     commaList(o.lvalues); str(' = '); node(o.rvalue)
     outputAfterComment(o)
     str(LF)
   end
   
   def visitOperatorAssignmentStmt(o)
+    outputSeparator(o.lvalue)
     node(o.lvalue)
     str(' ' + o.op + '= ')
     node(o.rvalue)
@@ -258,12 +260,14 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitReturnStmt(o)
+    outputSeparator(o)
     str('return ')
     node(o.expr)
     str(LF)
   end
   
   def visitWhileStmt(o)
+    outputSeparator(o)
     str('while ')
     node(o.expr)
     str(':' + LF)
@@ -272,12 +276,16 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitBreakStmt(o)
+    outputSeparator(o)
     str('break' + LF)
   end
   
   def visitRepeatStmt(o)
+    outputSeparator(o)
     str('while True:' + LF)
-    nodes(o.body)
+    if o.body != []
+      nodes(o.body)
+    end
     str('if ')
     node(o.expr)
     str(': break' + LF)
@@ -285,6 +293,7 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitIfStmt(o)
+    outputSeparator(o)
     str('if ')
     node(o.expr[0])
     str(':' + LF)

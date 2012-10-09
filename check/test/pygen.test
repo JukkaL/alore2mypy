@@ -912,3 +912,44 @@ x # X
 class X:    # Bar
     pass
 
+
+[case testCommentBefore]
+var a
+---- ass
+a = 1
+---- op ass
+a += 1
+---- if
+if a
+end
+def f()
+  -- ret
+  return a
+  -- while
+  while a
+    -- br
+    break
+  end
+  -- repeat
+  repeat
+  until a
+end
+[out]
+any a
+# ass
+a = 1
+# op ass
+a += 1
+# if
+if a:
+    pass
+def f():
+    # ret
+    return a
+    # while
+    while a:
+        # br
+        break
+    # repeat
+    while True:
+        if a: break
