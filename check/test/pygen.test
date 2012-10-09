@@ -1030,3 +1030,12 @@ class A:
         pass
     def __neg__(self):
         pass
+
+[case testMoreSpecialMethods]
+class A
+  def _in(x); end
+end
+[out]
+class A:
+    def __contains__(self, x):
+        pass
