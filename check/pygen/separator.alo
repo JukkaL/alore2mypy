@@ -18,6 +18,11 @@ const SepMap = Map(
   ForStmt : ['forTok'],
   IfStmt : ['ifTok'],
   ReturnStmt : ['returnTok'],  
+  SwitchStmt : ['switchTok'],
+  ForStmt : ['forTok'],
+  TryFinallyStmt : ['tryTok'],
+  TryExceptStmt : ['tryTok'],
+  RaiseStmt : ['raiseTok'],
   
   NameExpr : ['components'],
   NameLvalue : ['lparens', 'base.components'],

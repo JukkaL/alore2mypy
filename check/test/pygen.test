@@ -913,7 +913,7 @@ class X:    # Bar
     pass
 
 
-[case testCommentBefore]
+[case testCommentBeforeStmt]
 var a
 ---- ass
 a = 1
@@ -953,3 +953,49 @@ def f():
     # repeat
     while True:
         if a: break
+
+[case testMoreCommentsBefore]
+var x
+---- sw
+switch x
+end
+---- try
+try
+finally
+end
+---- try
+try
+except Exception
+end
+---- raise
+raise x
+---- for
+for a in x
+end
+[file std/std.alo]
+module std
+class Object
+end
+class Exception
+end
+interface Iterable
+end
+[out]
+any x
+# sw
+_x = x
+# try
+try:
+    pass
+finally:
+    pass
+# try
+try:
+    pass
+except Exception:
+    pass
+# raise
+raise x
+# for
+for a in x:
+    pass

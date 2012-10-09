@@ -314,6 +314,7 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitSwitchStmt(o)
+    outputSeparator(o)
     -- TODO give better name
     str('_x = '); node(o.expr); str(LF)
     for i in 0 to o.cases.length()
@@ -349,6 +350,7 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitTryExceptStmt(o)
+    outputSeparator(o)
     str('try:' + LF)
     nodes(o.body)
     dedent()
@@ -364,6 +366,7 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitTryFinallyStmt(o)
+    outputSeparator(o)
     str('try:' + LF)
     nodes(o.body)
     dedent()
@@ -373,6 +376,7 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitForStmt(o)
+    outputSeparator(o)
     str('for ')
     for i in 0 to o.index.length()
       if o.types[i] != nil
@@ -392,6 +396,7 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitRaiseStmt(o)
+    outputSeparator(o)
     str('raise ')
     node(o.expr)
     str(LF)
