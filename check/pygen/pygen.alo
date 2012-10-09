@@ -25,6 +25,8 @@ const MemberMap = Map(
   '_idiv' : '__floordiv__',  
   '_neg' : '__neg__',
   '_in'  : '__contains__',
+  '_get' : '__getitem__',
+  '_set' : '__setitem__',
   
   ) as Map<Str, Str>
 

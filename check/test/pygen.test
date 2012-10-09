@@ -1034,8 +1034,14 @@ class A:
 [case testMoreSpecialMethods]
 class A
   def _in(x); end
+  def _get(x); end
+  def _set(x, y); end
 end
 [out]
 class A:
     def __contains__(self, x):
+        pass
+    def __getitem__(self, x):
+        pass
+    def __setitem__(self, x, y):
         pass
