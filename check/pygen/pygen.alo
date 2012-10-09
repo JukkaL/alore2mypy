@@ -15,7 +15,17 @@ const OpMap = Map('div' : '//', 'mod' : '%') as Map<Str, Str>
 const MemberMap = Map(
   'create' : '__init__',
   '_str' : '__str__',
-  '_repr' : '__repr__') as Map<Str, Str>
+  '_repr' : '__repr__',
+  '_add' : '__add__',
+  '_sub' : '__sub__',
+  '_mul' : '__mul__',
+  '_div' : '__truediv__',
+  '_mod' : '__mod__',
+  '_pow' : '__pow__',
+  '_idiv' : '__floordiv__',  
+  '_neg' : '__neg__',
+  
+  ) as Map<Str, Str>
 
 
 class PythonGeneratorVisitor is NodeVisitor

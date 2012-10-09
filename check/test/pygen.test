@@ -999,3 +999,34 @@ raise x
 # for
 for a in x:
     pass
+
+
+[case testSpecialMethods]
+class A
+  def _add(x); end
+  def _sub(x); end
+  def _mul(x); end
+  def _div(x); end
+  def _pow(x); end
+  def _mod(x); end
+  def _idiv(x); end
+  def _neg(); end
+end
+[out]
+class A:
+    def __add__(self, x):
+        pass
+    def __sub__(self, x):
+        pass
+    def __mul__(self, x):
+        pass
+    def __truediv__(self, x):
+        pass
+    def __pow__(self, x):
+        pass
+    def __mod__(self, x):
+        pass
+    def __floordiv__(self, x):
+        pass
+    def __neg__(self):
+        pass
