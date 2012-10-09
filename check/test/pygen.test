@@ -1045,3 +1045,10 @@ class A:
         pass
     def __setitem__(self, x, y):
         pass
+
+[case testCommentAfterOpAssign]
+var x
+x += 1 -- foo
+[out]
+any x
+x += 1 # foo

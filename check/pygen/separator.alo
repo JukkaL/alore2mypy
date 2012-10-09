@@ -81,6 +81,7 @@ const AfterCommentMap = Map(
   FuncDef : 'defBr',
   TypeDef : 'headerBr',
   AssignmentStmt : 'br',
+  OperatorAssignmentStmt : 'br',
   ExpressionStmt : 'br')
 
   

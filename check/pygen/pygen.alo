@@ -269,6 +269,7 @@ class PythonGeneratorVisitor is NodeVisitor
     node(o.lvalue)
     str(' ' + o.op + '= ')
     node(o.rvalue)
+    outputAfterComment(o)
     str(LF)
   end
   
