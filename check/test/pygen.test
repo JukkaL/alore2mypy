@@ -1052,3 +1052,15 @@ x += 1 -- foo
 [out]
 any x
 x += 1 # foo
+
+
+[case testGenericFunction]
+def f<T>(x as T)
+end
+def g<T, S>(x as T) as S
+end
+[out]
+void f<T>(T x):
+    pass
+S g<T, S>(T x):
+    pass

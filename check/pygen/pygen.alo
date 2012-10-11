@@ -181,6 +181,17 @@ class PythonGeneratorVisitor is NodeVisitor
     else
       str(rename(o.fullName, o.name))
     end
+    if t != nil and t.variables.items != []
+      var it = t.variables.items
+      str('<')
+      for i in 0 to it.length()
+        str(it[i].name)
+        if i < it.length() - 1
+          str(', ')
+        end
+      end
+      str('>')
+    end
     str('(')
     if o.info != nil
       str('self')
