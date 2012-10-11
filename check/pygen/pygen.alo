@@ -100,9 +100,6 @@ class PythonGeneratorVisitor is NodeVisitor
   
   def visitVarDef(o)
     outputSeparator(o)
-    if o.kind == Mdef
-      str('member ')
-    end
     var n = o.names.length()
     if n == 1
       if o.type != nil
@@ -111,7 +108,7 @@ class PythonGeneratorVisitor is NodeVisitor
       elif o.init is TypeApplication and o.kind != Gdef
         type(types[o.init])
         str(' ')
-      elif o.init == nil and o.kind != Mdef
+      elif o.init == nil
         str('any ')
       end
       node(o.names[0])

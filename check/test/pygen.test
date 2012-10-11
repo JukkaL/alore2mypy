@@ -304,9 +304,9 @@ class A
 end
 [out]
 class A:
-    member x
-    member y = 4
-    member A z
+    any x
+    y = 4
+    A z
     
     void __init__(self, any x, A z):
         self.x = x
@@ -326,7 +326,7 @@ class A
 end
 [out]
 class A:
-    member x = None
+    x = None
     def f(self):
         self.x
         self.x = 1
@@ -686,7 +686,7 @@ void f():
     A<object> a = A()
     A()
 class A<T>:
-    member list<object> m = []
+    list<object> m = []
 
 
 [case testSlices]
@@ -809,7 +809,7 @@ x((A)x[1])
 (any)x
 y = (A)x
 class A:
-    member m = None
+    m = None
 
 
 [case testSuperclassReference]
