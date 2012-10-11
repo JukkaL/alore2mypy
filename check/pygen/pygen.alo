@@ -287,6 +287,7 @@ class PythonGeneratorVisitor is NodeVisitor
     outputSeparator(o)
     str('return ')
     node(o.expr)
+    outputAfterComment(o)
     str(LF)
   end
   

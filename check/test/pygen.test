@@ -1079,3 +1079,12 @@ void f<T>(T x):
     pass
 S g<T, S>(T x):
     pass
+
+
+[case testCommentAfterReturn]
+def f()
+  return nil -- foo
+end
+[out]
+def f():
+    return None # foo
