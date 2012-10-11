@@ -1088,3 +1088,10 @@ end
 [out]
 def f():
     return None # foo
+
+
+[case testArrayExpressionAndTypeApplication]
+[1, 2] as <Object>
+[usestd fixtures/std-array.alo]
+[out]
+<object> [1, 2]

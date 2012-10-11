@@ -660,6 +660,11 @@ class PythonGeneratorVisitor is NodeVisitor
       end
       str('>')
       callExprArgs(o.expr)
+    elif o.expr is ArrayExpr
+      str('<')
+      type(o.types[0])
+      str('> ')
+      node(o.expr)
     else
       -- TODO other targets (Array expression etc.)
       node(o.expr)
