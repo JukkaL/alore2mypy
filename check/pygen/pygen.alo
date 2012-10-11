@@ -101,14 +101,16 @@ class PythonGeneratorVisitor is NodeVisitor
   def visitVarDef(o)
     outputSeparator(o)
     var n = o.names.length()
+    var init = o.init
     if n == 1
       if o.type != nil
         type(o.type.type)
         str(' ')
-      elif o.init is TypeApplication and o.kind != Gdef
-        type(types[o.init])
+      elif init is TypeApplication and o.kind != Gdef
+        type(types[init])
         str(' ')
-      elif o.init == nil
+        init = init.expr
+      elif init == nil
         str('any ')
       end
       node(o.names[0])
@@ -121,7 +123,7 @@ class PythonGeneratorVisitor is NodeVisitor
         if t != nil
           type(t[i])
           str(' ')
-        elif o.init == nil and o.kind != Mdef
+        elif init == nil and o.kind != Mdef
           str('any ')
         end
         node(o.names[i])
@@ -130,12 +132,12 @@ class PythonGeneratorVisitor is NodeVisitor
         end
       end        
     end
-    if o.init != nil
+    if init != nil
       str(' = ')
-      if o.init is ParenExpr and o.init.expr is CastExpr
-        node(o.init.expr)
+      if init is ParenExpr and init.expr is CastExpr
+        node(init.expr)
       else
-        node(o.init)
+        node(init)
       end
     end
     outputAfterComment(o)
@@ -573,6 +575,10 @@ class PythonGeneratorVisitor is NodeVisitor
       return
     end
     node(o.callee)
+    callExprArgs(o)
+  end
+  
+  def callExprArgs(o)
     str('(')
     for i in 0 to o.args.length()
       if i == o.args.length() - 1 and o.isVarArg
@@ -642,7 +648,25 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def visitTypeApplication(o)
-    node(o.expr)
+    if o.expr is CallExpr and not isMapExpr(o.expr.callee)
+      node(o.expr.callee)
+      str('<')
+      for i in 0 to o.types.length()
+        type(o.types[i])
+        if i < o.types.length() - 1
+          str(', ')
+        end
+      end
+      str('>')
+      callExprArgs(o.expr)
+    else
+      -- TODO other targets (Array expression etc.)
+      node(o.expr)
+    end
+  end
+  
+  def isMapExpr(o)
+    return o is NameExpr and o.fullName == 'std::Map'
   end
   
   def visitCastExpr(o)

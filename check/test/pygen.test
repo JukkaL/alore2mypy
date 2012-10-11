@@ -672,10 +672,9 @@ m1 = {1: 'foo'}
 m2 = {'x': 'y', 'z': 'y'}
 
 
-[case testTypeApplication]
+[case testTypeApplicationInInit]
 def f() as void
   var a = A() as <Object>
-  A() as <Object>
 end
 class A<T>
   var m = [] as <Object>
@@ -684,9 +683,25 @@ end
 [out]
 void f():
     A<object> a = A()
-    A()
 class A<T>:
     list<object> m = []
+
+[case testTypeApplication]
+f() as <Object>
+g() as <dynamic, Object>
+
+def f<T>() as void
+end
+def g<T, S>() as void
+end
+[out]
+f<object>()
+g<any, object>()
+
+void f<T>():
+    pass
+void g<T, S>():
+    pass
 
 
 [case testSlices]
