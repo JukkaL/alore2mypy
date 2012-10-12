@@ -106,7 +106,7 @@ class PythonGeneratorVisitor is NodeVisitor
       if o.type != nil
         type(o.type.type)
         str(' ')
-      elif init is TypeApplication and o.kind != Gdef
+      elif init is TypeApplication and o.kind != Gdef and types.hasKey(init)
         type(types[init])
         str(' ')
         init = init.expr
@@ -652,12 +652,7 @@ class PythonGeneratorVisitor is NodeVisitor
     if o.expr is CallExpr and not isMapExpr(o.expr.callee)
       node(o.expr.callee)
       str('<')
-      for i in 0 to o.types.length()
-        type(o.types[i])
-        if i < o.types.length() - 1
-          str(', ')
-        end
-      end
+      typeList(o.types)
       str('>')
       callExprArgs(o.expr)
     elif o.expr is ArrayExpr
@@ -665,9 +660,23 @@ class PythonGeneratorVisitor is NodeVisitor
       type(o.types[0])
       str('> ')
       node(o.expr)
+    elif o.expr is ParenExpr and o.expr.expr is TupleExpr
+      str('<')
+      typeList(o.types)
+      str('> ')
+      node(o.expr)
     else
       -- TODO other targets (Array expression etc.)
       node(o.expr)
+    end
+  end
+  
+  def typeList(types)
+    for i in 0 to types.length()
+      type(types[i])
+      if i < types.length() - 1
+        str(', ')
+      end
     end
   end
   

@@ -1095,3 +1095,8 @@ def f():
 [usestd fixtures/std-array.alo]
 [out]
 <object> [1, 2]
+
+[case testTupleExpressionAndTypeApplication]
+(1, 2) as <Object, dynamic>
+[out]
+<object, any> (1, 2)
