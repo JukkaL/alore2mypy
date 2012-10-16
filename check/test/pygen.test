@@ -1100,3 +1100,20 @@ var b as def ()
 [out]
 func<any, object, Type> a
 func<void> b
+
+
+[case testVarArgs]
+def f(x, *y)
+end
+def g(*y as Object)
+end
+f(*[1, 2])
+f(1, *[1, 2])
+[usestd fixtures/std-array.alo]
+[out]
+def f(x, *y):
+    pass
+void g(object *y):
+    pass
+f(*[1, 2])
+f(1, *[1, 2])

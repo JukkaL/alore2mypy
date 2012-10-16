@@ -210,6 +210,9 @@ class PythonGeneratorVisitor is NodeVisitor
         type(t.argTypes[i])
         str(' ')
       end
+      if i == o.args.length() - 1 and o.isVarArg
+        str('*')
+      end
       node(o.args[i])
       if o.init[i] != nil
         str('=')
