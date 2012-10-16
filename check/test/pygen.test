@@ -24,10 +24,8 @@ end
 class Boo
 end
 [out]
-class A:
-    pass
-class Boo:
-    pass
+class A: pass
+class Boo: pass
 
 
 [case testGlobalVarDef]
@@ -42,8 +40,7 @@ any a
 A b
 A c = b
 d = c
-class A:
-    pass
+class A: pass
     
     
 [case testGlobalConst]
@@ -212,10 +209,8 @@ void g():
     pass
 void h(any a, A b):
     pass
-class A:
-    pass
-class B:
-    pass
+class A: pass
+class B: pass
 
 
 [case testFuncWithDefaultArgs]
@@ -385,8 +380,7 @@ end
 [usestd fixtures/std-primitives.alo]
 [out]
 isinstance(1, A)
-class A:
-    pass
+class A: pass
 
 
 [case testToOperator]
@@ -485,8 +479,7 @@ B<A<any>, any> b
 class A<T>:
     T f(self):
         pass
-class B<T, S>:
-    pass
+class B<T, S>: pass
 
 
 [case testTupleTypes]
@@ -547,8 +540,7 @@ len('foo')
 class A is Object
 end
 [out]
-class A(object):
-    pass
+class A(object): pass
 
 
 [case testIntersectionTypes]
@@ -566,10 +558,8 @@ A f(A a):
 
 B f(B a):
     return a
-class A:
-    pass
-class B:
-    pass
+class A: pass
+class B: pass
 
 
 [case testRaiseStatement]
@@ -597,8 +587,7 @@ y = A()
 def f():
     pass
 
-class A:
-    pass
+class A: pass
 
 
 [case testComments]
@@ -879,8 +868,7 @@ from x import f, g, A, B
 f
 g
 A a
-class C(B):
-    pass
+class C(B): pass
     
     
 [case testImportsInModule]
@@ -900,8 +888,7 @@ x/x.alo:
 from y import a
 a
 A()
-class A:
-    pass
+class A: pass
 
 
 [case testCommentAfterDef]
@@ -920,13 +907,18 @@ x = 1 -- Foo
 x -- X
 class X    -- Bar
 end
+class Y    -- Zar
+  def f(x)
+  end
+end
 [out]
 any x
 x = 1 # Foo
 x # X
-class X:    # Bar
-    pass
-
+class X: pass    # Bar
+class Y:    # Zar
+    def f(self, x):
+        pass
 
 [case testCommentBeforeStmt]
 var a

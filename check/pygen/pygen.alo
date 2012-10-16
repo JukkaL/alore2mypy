@@ -93,9 +93,13 @@ class PythonGeneratorVisitor is NodeVisitor
       node(o.base)
       str(')')
     end
-    str(':' + GetAfterComment(o) + LF, True, True)
-    nodes(o.defs)
-    dedent()
+    if o.defs == []
+      str(': pass' + GetAfterComment(o) + LF)
+    else
+      str(':' + GetAfterComment(o) + LF, True, True)
+      nodes(o.defs)
+      dedent()
+    end
   end  
   
   def visitVarDef(o)
