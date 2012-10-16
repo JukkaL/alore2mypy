@@ -1092,3 +1092,11 @@ def f():
 (1, 2) as <Object, dynamic>
 [out]
 <object, any> (1, 2)
+
+
+[case testSimpleCallableTypes]
+var a as def (dynamic, Object) as Type
+var b as def ()
+[out]
+func<any, object, Type> a
+func<void> b
