@@ -1117,3 +1117,19 @@ void g(object *y):
     pass
 f(*[1, 2])
 f(1, *[1, 2])
+
+
+[case testInterfaces]
+interface A
+end
+
+interface B is A
+  def f(x as A) as void
+  def g()
+end
+[out]
+interface A: pass
+
+interface B(A):
+    void f(self, A x)
+    def g(self)

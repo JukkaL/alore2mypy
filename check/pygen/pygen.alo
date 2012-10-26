@@ -40,6 +40,7 @@ class PythonGeneratorVisitor is NodeVisitor
   const renamer
   const types
   var curMod = ''
+  var isInterface = False
   
   def create(renamer, types)
     self.renamer = renamer
@@ -84,7 +85,13 @@ class PythonGeneratorVisitor is NodeVisitor
   
   def visitTypeDef(o)
     outputSeparator(o)
-    str('class {}'.format(o.name))
+    if o.isInterface
+      str('interface')
+      self.isInterface = True
+    else
+      str('class')
+    end
+    str(' {}'.format(o.name))
     if o.info.typeVars != []
       str('<{}>'.format(', '.join(o.info.typeVars)))
     end
@@ -100,7 +107,8 @@ class PythonGeneratorVisitor is NodeVisitor
       nodes(o.defs)
       dedent()
     end
-  end  
+    self.isInterface = False
+  end
   
   def visitVarDef(o)
     outputSeparator(o)
@@ -222,9 +230,13 @@ class PythonGeneratorVisitor is NodeVisitor
         str(', ')
       end
     end
-    str('):' + GetAfterComment(o) + LF, True, True)
-    nodes(o.body)
-    dedent()
+    if not self.isInterface
+      str('):' + GetAfterComment(o) + LF, True, True)
+      nodes(o.body)
+      dedent()
+    else
+      str(')' + GetAfterComment(o) + LF)
+    end
   end
   
   def outputAccessor(o, t)
