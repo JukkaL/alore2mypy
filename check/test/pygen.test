@@ -1133,3 +1133,27 @@ interface A: pass
 interface B(A):
     void f(self, A x)
     def g(self)
+
+[case testInterfaceImplementation]
+interface A
+end
+interface B<T>
+end
+class C implements A
+end
+class D implements B<C>, A
+end
+[out]
+interface A: pass
+interface B<T>: pass
+class C(A): pass
+class D(B, A): pass
+
+[case testExtensionAndImplementation]
+interface A
+end
+class C is Object implements A
+end
+[out]
+interface A: pass
+class C(object, A): pass
