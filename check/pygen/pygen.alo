@@ -95,18 +95,26 @@ class PythonGeneratorVisitor is NodeVisitor
     if o.info.typeVars != []
       str('<{}>'.format(', '.join(o.info.typeVars)))
     end
-    if (o.base != nil and o.base.repr != nil) or o.implement != []
+    if (o.base != nil and o.base.repr != nil) or o.baseTypes.length() > 1 or
+       o.baseTypes[0] != nil
       str('(')
       var first = True
       if o.base != nil and o.base.repr != nil
         node(o.base)
         first = False
+      elif o.baseTypes[0] != nil
+        type(o.baseTypes[0])
+        first = False
       end
-      for i in o.implement
+      for i in 1 to o.baseTypes.length()
         if not first
           str(', ')
         end
-        node(i)
+        if o.baseTypes[i] != nil
+          type(o.baseTypes[i])
+        else
+          node(o.implement[i - 1])
+        end
         first = False
       end
       str(')')

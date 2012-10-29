@@ -1147,7 +1147,7 @@ end
 interface A: pass
 interface B<T>: pass
 class C(A): pass
-class D(B, A): pass
+class D(B<C>, A): pass
 
 [case testExtensionAndImplementation]
 interface A
@@ -1157,3 +1157,12 @@ end
 [out]
 interface A: pass
 class C(object, A): pass
+
+[case testGenericBaseClass]
+class A<T>
+end
+class B is A<B>
+end
+[out]
+class A<T>: pass
+class B(A<B>): pass
