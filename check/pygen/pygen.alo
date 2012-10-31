@@ -34,6 +34,16 @@ const MemberMap = Map(
   ) as Map<Str, Str>
 
 
+-- Map for renaming identifiers that clash with mypy keywords.
+const KwMap = Map(
+  'pass' : '_pass',
+  'with' : '_with',
+  'assert' : '_assert',
+  'global' : '_global',
+  'lambda' : '_lambda',
+  'yield' : '_yield') as Map<Str, Str>
+
+
 class PythonGeneratorVisitor is NodeVisitor
   const importFrom = []  -- (module, name) tuples
   const imports = []   -- Imports of form "import x"
@@ -94,7 +104,7 @@ class PythonGeneratorVisitor is NodeVisitor
     else
       str('class')
     end
-    str(' {}'.format(o.name))
+    str(' {}'.format(rename(o.fullName, o.name)))
     if o.info.typeVars != []
       str('<{}>'.format(', '.join(o.info.typeVars)))
     end
@@ -802,6 +812,9 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def rename(full, name)
+    if KwMap.hasKey(name)
+      return KwMap[name]
+    end
     var n = self.renamer.rename(full)
     if n == nil
       n = full
@@ -822,6 +835,9 @@ class PythonGeneratorVisitor is NodeVisitor
   end
   
   def renameMember(name)
+    if KwMap.hasKey(name)
+      return KwMap[name]
+    end
     var n = self.renamer.renameMember(name)
     if n == nil
       return name

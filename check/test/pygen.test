@@ -1175,3 +1175,20 @@ end
 [out]
 class A<T>: pass
 class B(A<B>): pass
+
+[case testMypyKeywordIdentifiers]
+var pass
+pass = pass
+pass.pass
+def with(yield, *lambda)
+  var global
+end
+class assert
+end
+[out]
+any _pass
+_pass = _pass
+_pass._pass
+def _with():
+    any _global
+class _assert: pass
