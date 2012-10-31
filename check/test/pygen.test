@@ -1218,3 +1218,8 @@ end
 def func_def(foo_bar):
     zar_zar = foo_bar
     zar_zar
+
+[case testRenameOtherClashes]
+var str
+[out]
+any string
