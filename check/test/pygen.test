@@ -1185,10 +1185,11 @@ def with(yield, *lambda)
 end
 class assert
 end
+[usestd fixtures/std-array.alo]
 [out]
 any _pass
 _pass = _pass
 _pass._pass
-def _with():
+def _with(_yield, *_lambda):
     any _global
 class _assert: pass
