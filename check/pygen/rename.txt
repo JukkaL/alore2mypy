@@ -64,6 +64,7 @@ std::Map             dict
 std::Tuple           tuple
 os::Stat             os.stat
 set::Set             set
+re::RegExp           Pattern
 
 # Misc
 
