@@ -45,10 +45,11 @@ class A: pass
     
 [case testGlobalConst]
 const a = 1
+-- initializer not int/str literal => no renaming
 const b = a
 [out]
-a = 1
-b = a
+A = 1
+b = A
 
 
 [case testAssignment]
@@ -1193,3 +1194,27 @@ _pass._pass
 def _with(_yield, *_lambda):
     any _global
 class _assert: pass
+
+[case testRenameConstant]
+const FooBar = 1
+const Zar = 2
+[out]
+FOO_BAR = 1
+ZAR = 2
+
+[case testRenameGlobalVariable]
+var FooBar = 1
+FooBar
+[out]
+foo_bar = 1
+foo_bar
+
+[case testRenameLocalVariableAndFunction]
+def FuncDef(fooBar)
+  var zarZar = fooBar
+  zarZar
+end
+[out]
+def func_def(foo_bar):
+    zar_zar = foo_bar
+    zar_zar

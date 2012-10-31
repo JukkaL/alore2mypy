@@ -33,6 +33,11 @@ private def TestPygen(testcase)
     var trees, symtable, infos, types =
                  Analyse(src, "main", False, TestTempDir, True)
     a = []
+    
+    var map, memberMap = BuildRenameMaps(trees)
+    var ren = PythonRenamer()
+    ren.update(map, memberMap)
+    
     var first = True
     for t in trees
       -- Omit the std module and files marked for omission.
@@ -42,7 +47,6 @@ private def TestPygen(testcase)
           a.append("{}:".format(FixPath(RemovePrefix(t.path, TestTempDir))))
         end
 
-        var ren = PythonRenamer()
         var v = PythonGeneratorVisitor(ren, types)
         t.accept(v)
         var s = v.output().strip()

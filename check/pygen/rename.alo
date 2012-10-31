@@ -74,6 +74,7 @@ class RenameSuggestionVisitor is TraverserVisitor
     for v in o.args
       add(v.name, False)
     end
+    super.visitFuncDef(o)
   end
   
   def visitVarDef(o)
