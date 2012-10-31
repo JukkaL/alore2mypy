@@ -752,7 +752,7 @@ end
 _x = 4
 if _x == 1:
     2
-elif _x in (2, 3):
+elif _x in [2, 3]:
     3
 else:
     4

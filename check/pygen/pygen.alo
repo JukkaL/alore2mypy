@@ -404,7 +404,7 @@ class PythonGeneratorVisitor is NodeVisitor
         str(' == ')
         node(o.cases[i][0])
       else
-        str(' in (')
+        str(' in [')
         var c = o.cases[i]
         for j in 0 to c.length()
           node(c[j])
@@ -412,7 +412,7 @@ class PythonGeneratorVisitor is NodeVisitor
             str(', ')
           end
         end
-        str(')')
+        str(']')
       end
       str(':' + LF)
       nodes(o.bodies[i])
