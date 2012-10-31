@@ -89,6 +89,14 @@ class RenameSuggestionVisitor is TraverserVisitor
       end
       add(v.name, o.kind == Mdef, v.fullName, isConst)
     end
+    super.visitVarDef(o)
+  end
+  
+  def visitForStmt(o)
+    for v in o.index
+      add(v.name, False, v.fullName, False)
+    end
+    super.visitForStmt(o)
   end
   
   def add(name, isMember, fullName = name, isConst = False)

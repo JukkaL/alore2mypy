@@ -1223,3 +1223,12 @@ def func_def(foo_bar):
 var str
 [out]
 any string
+
+[case testRenameForIndexVariable]
+for fooBar in [Object()]
+  fooBar
+end
+[usestd fixtures/std-for.alo]
+[out]
+for foo_bar in [object()]:
+    foo_bar
