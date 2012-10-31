@@ -1232,3 +1232,14 @@ end
 [out]
 for foo_bar in [object()]:
     foo_bar
+
+[case testAnonymousFunction]
+var x = (def (y)
+  y += 1
+  return y
+end)
+[out]
+x = (xxx_def (y):
+    y += 1
+    return y
+)

@@ -223,7 +223,8 @@ class PythonGeneratorVisitor is NodeVisitor
     else
       str('def ')
     end
-    if o.info != nil
+    if o is FuncExpr
+    elif o.info != nil
       str(translateMember(o.name))
     else
       str(rename(o.fullName, o.name))
@@ -240,7 +241,7 @@ class PythonGeneratorVisitor is NodeVisitor
       str('>')
     end
     str('(')
-    if o.info != nil
+    if o is FuncDef and o.info != nil
       str('self')
       if o.args != []
         str(', ')
@@ -752,6 +753,15 @@ class PythonGeneratorVisitor is NodeVisitor
       node(o.expr)
       str(')')
     end
+  end
+  
+  def visitFuncExpr(o)
+    str('xxx_')
+    var t = nil
+    if o.type != nil
+      t = o.type.type
+    end
+    outputFunctionVariant(o, t)
   end
 
   
