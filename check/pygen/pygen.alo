@@ -15,6 +15,9 @@ const OpMap = Map('div' : '//', 'mod' : '%') as Map<Str, Str>
 const MemberMap = Map(
   'create' : '__init__',
   '_str' : '__str__',
+  '_int' : '__int__',
+  '_float' : '__float__',
+  '_hash' : '__hash__',
   '_repr' : '__repr__',
   '_add' : '__add__',
   '_sub' : '__sub__',

@@ -1043,6 +1043,9 @@ class A
   def _in(x); end
   def _get(x); end
   def _set(x, y); end
+  def _int(); end
+  def _float(); end
+  def _hash(); end
 end
 [out]
 class A:
@@ -1051,6 +1054,12 @@ class A:
     def __getitem__(self, x):
         pass
     def __setitem__(self, x, y):
+        pass
+    def __int__(self):
+        pass
+    def __float__(self):
+        pass
+    def __hash__(self):
         pass
 
 [case testCommentAfterOpAssign]
