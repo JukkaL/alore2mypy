@@ -17,11 +17,7 @@ reflect::SetMember  setattr
 reflect::HasMember  hasattr
 reflect::TypeOf     type
 
-unittest::AssertEquals    assertEquals
-unittest::AssertNotEqual  assertNotEqual
-unittest::AssertRaises    assertRaises
-unittest::Assert          assertTrue
-unittest::AssertType      assertType
+unittest::Assert          assert_true
 
 re::Match       re.match
 re::Subst       re.sub
