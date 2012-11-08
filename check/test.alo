@@ -8,7 +8,7 @@ import re, os
 
 -- Files which contain test case descriptions.
 const PygenFiles = ["pygen.test"]
-const TestDataPrefix = "test"
+const TestDataPrefix = "tests"
 const TestTempDir = "tmp"
 
 

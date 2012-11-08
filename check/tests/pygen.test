@@ -1243,3 +1243,7 @@ x = (xxx_def (y):
     y += 1
     return y
 )
+
+-- TODO rename variable with name 're' -> 'regex'
+-- TODO rename _str to __repr__ unless also _repr defined
+-- TODO rename variable with name 'type' -> 'typ'
