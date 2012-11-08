@@ -42,7 +42,9 @@ const ClashMap = Map(
   'global' : '_global',
   'lambda' : '_lambda',
   'yield' : '_yield',
-  'str' : 'string') as Map<Str, Str>
+  'str' : 'string',
+  're' : 'regex',
+  'type' : 'typ') as Map<Str, Str>
 
 
 class PythonGeneratorVisitor is NodeVisitor

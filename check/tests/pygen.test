@@ -1244,6 +1244,18 @@ x = (xxx_def (y):
     return y
 )
 
--- TODO rename variable with name 're' -> 'regex'
+[case testTestMiscRenames]
+def f(re)
+  re += 1
+end
+def g(type)
+  type += 1
+end
+[out]
+def f(regex):
+    regex += 1
+def g(typ):
+    typ += 1
+
+
 -- TODO rename _str to __repr__ unless also _repr defined
--- TODO rename variable with name 'type' -> 'typ'
