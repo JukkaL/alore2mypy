@@ -1280,5 +1280,21 @@ class A:
         # foo
         self.g()
 
+[case testRenameMinAndMax]
+var o as Object
+var min = Min(o, o)
+var max = Max(o, o)
+[file std/std.alo]
+module std
+class Object
+end
+def Min(x, y)
+end
+def Max(x, y)
+end
+[out]
+object o
+min_ = min(o, o)
+max_ = max(o, o)
 
 -- TODO rename _str to __repr__ unless also _repr defined
