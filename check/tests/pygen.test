@@ -1257,5 +1257,28 @@ def f(regex):
 def g(typ):
     typ += 1
 
+[case testCommentBeforeAndAfterExpressionStatement]
+---- foo
+Object() -- bar
+var a
+---- bar
+a.x()
+class A
+  def f()
+    -- foo
+    self.g()
+  end
+end
+[out]
+# foo
+object() # bar
+any a
+# bar
+a.x()
+class A:
+    def f(self):
+        # foo
+        self.g()
+
 
 -- TODO rename _str to __repr__ unless also _repr defined

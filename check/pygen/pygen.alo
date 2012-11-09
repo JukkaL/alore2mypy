@@ -317,6 +317,7 @@ class PythonGeneratorVisitor is NodeVisitor
   
   
   def visitExpressionStmt(o)
+    outputSeparator(o)
     node(o.expr)
     outputAfterComment(o)
     str(LF)

@@ -23,9 +23,16 @@ const SepMap = Map(
   TryFinallyStmt : ['tryTok'],
   TryExceptStmt : ['tryTok'],
   RaiseStmt : ['raiseTok'],
+  ExpressionStmt : [':expr'],
   
   NameExpr : ['components'],
   NameLvalue : ['lparens', 'base.components'],
+  
+  ParenExpr : ['lparen'],
+  SelfExpr : ['selfTok'],
+  CallExpr : [':callee'],
+  MemberExpr : [':expr'],
+  TypeApplication : [':expr'],
   
   ) as Map<Type, Array<Str>>
 
@@ -34,9 +41,15 @@ def GetSeparator(o)
   if o.repr == nil
     return ''
   end
+  var toks = GetSeparatorToks(o)
+  return GetSep(toks)
+end
+
+
+def GetSeparatorToks(o)
   var toks = []
   for member in SepMap.get(TypeOf(o), [])
-    var t = GetMembers(o.repr, member)
+    var t = GetMembers(o, member)
     if t is Array
       if t != []
         toks.append(t[0])
@@ -45,15 +58,20 @@ def GetSeparator(o)
       toks.append(t)
     end
   end
-  return GetSep(toks)
+  return toks
 end
 
 
-def GetMembers(o, ms)
-  for m in ms.split('.')
-    o = GetMember(o, m)
+def GetMembers(o, members)
+  if not members.startsWith(':')
+    var r = o.repr
+    for m in members.split('.')
+      r = GetMember(r, m)
+    end
+    return r
+  else
+    return GetSeparatorToks(GetMember(o, members[1:]))
   end
-  return o
 end
 
 
